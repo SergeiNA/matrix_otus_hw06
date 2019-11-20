@@ -6,6 +6,12 @@
 #include <array>
 #include <exception>
 
+template <class T>
+constexpr std::add_const_t<T>& as_const(T& t) noexcept
+{
+    return t;
+}
+
 
 template<class T, int defaultParam = 0,size_t dimentions = 2>
 class Matrix{
@@ -187,7 +193,7 @@ private:
         }
 
         operator T()const {
-			return std::as_const(proxy_matrix_)(indx_);
+			return as_const(proxy_matrix_)(indx_);
 		}
 
 	private:
