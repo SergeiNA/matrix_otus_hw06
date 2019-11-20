@@ -63,13 +63,18 @@ public:
         return defaultParam;
     }
 
-    auto begin(){
-        return Matrix_iterator<decltype(std::begin(matrix_))>(std::begin(matrix_));
+    void reset(){
+        matrix_.clear();
     }
+    
+    // need IterProxy
+    // auto begin(){
+    //     return Matrix_iterator<decltype(std::begin(matrix_))>(std::begin(matrix_));
+    // }
 
-    auto end(){
-        return Matrix_iterator<decltype(std::end(matrix_))>(std::end(matrix_));    
-    }
+    // auto end(){
+    //     return Matrix_iterator<decltype(std::end(matrix_))>(std::end(matrix_));    
+    // }
     
     auto begin()const{
         return Matrix_iterator<decltype(std::cbegin(matrix_))>(std::begin(matrix_));
@@ -94,7 +99,7 @@ public:
 
     template<class U, int defaultParamRhs>
     auto operator- (const Matrix<U,defaultParamRhs,dimentions>& rhs)const{
-        Matrix<U,defaultParamRhs+defaultParam,dimentions> result;
+        Matrix<U,defaultParam - defaultParamRhs,dimentions> result;
 
         for(const auto& elem:matrix_)
             result(elem.first) = elem.second -  rhs(elem.first);
@@ -128,6 +133,10 @@ public:
     // }
 
 private:
+    /* class IterProxy to handle something like 
+	for(auto& elem:matrix)
+		elem.second = 0;
+    */
     template <typename Iter>
     class Matrix_iterator{
     public:

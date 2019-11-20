@@ -128,7 +128,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
     }
     {
         // diagonal + chess
-        std::cout<<"Task\n";
+        std::cout<<"Main task\n";
         Matrix<int, 0> matrix;
         const size_t N = 10;
         for (size_t i = 0; i < N; i++)
@@ -173,6 +173,13 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         matrix_2(1,1) = 5;
         matrix_2(2,1) = 5;
         auto matrix_3 = matrix_1 + matrix_2;
+
+        assert(matrix_3(1,1)== 15);
+        assert(matrix_3(2,1)== 6);
+        assert(matrix_3(1,2)== 12);
+        assert(matrix_3.getDefaultNum() == 3);
+        assert(matrix_3.size() == 3);
+
         std::cout<<matrix_3.getDefaultNum()<<std::endl;
         std::cout<<matrix_3(1,1)<<std::endl;
         std::cout<<matrix_3(1,2)<<std::endl;
@@ -188,27 +195,28 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         matrix_2(1,1) = 5;
         matrix_2(2,1) = 5;
         auto matrix_3 = matrix_1 - matrix_2;
+
+        assert(matrix_3(1,1)== 5);
+        assert(matrix_3(2,1)== -4);
+        assert(matrix_3(1,2)== 8);
+        assert(matrix_3.getDefaultNum() == -1);
+        assert(matrix_3.size() == 3);
+
         std::cout<<matrix_3.getDefaultNum()<<std::endl;
         std::cout<<matrix_3(1,1)<<std::endl;
         std::cout<<matrix_3(1,2)<<std::endl;
         std::cout<<matrix_3(2,1)<<std::endl;
     }
 
-    // {
-    //     std::cout<<"Add/substr number"<<std::endl;
-    //     Matrix<int,1> matrix_1;
-    //     matrix_1(1,1) = 10;
-    //     matrix_1(1,2) = 10;
-    //     auto matrix_2 = matrix_1 + 10;
-    //     std::cout<<matrix_2.getDefaultNum()<<std::endl;
-    //     std::cout<<matrix_2(1,1)<<std::endl;
-    //     std::cout<<matrix_2(1,2)<<std::endl;
-    //     auto matrix_3 = matrix_2 - 10;
-    //     std::cout<<matrix_3.getDefaultNum()<<std::endl;
-    //     std::cout<<matrix_3(1,1)<<std::endl;
-    //     std::cout<<matrix_3(1,2)<<std::endl;
-    // }
-    
+    {
+        std::cout<<"Reset"<<std::endl;
+        Matrix<int,1> matrix_1;
+        matrix_1(1,1) = 10;
+        matrix_1(1,2) = 10;
+        matrix_1.reset();
+        assert(matrix_1.size() == 0);
+    }
+
 
     return 0;
 }
