@@ -4,14 +4,128 @@
 #include <utility>
 #include <boost/functional/hash.hpp>
 #include <array>
+#include <exception>
 
 
-template<class T,size_t Space, size_t defaultParam = 0>
+template<class T, int defaultParam = 0,size_t dimentions = 2>
 class Matrix{
+    class IndexProxy;
 public:
-    typedef std::array<size_t,Space> elem_pos;
-    // typedef std::unordered_map<elem_pos,T,boost::hash<elem_pos>> matrix_core_;
-    using matrix_core_ = std::unordered_map<elem_pos,T,boost::hash<elem_pos>>;
+    using nsp_indx = std::array<size_t,dimentions> ;
+    using matrix_core_ = std::unordered_map<nsp_indx,T,boost::hash<nsp_indx>>;
+public:
+    Matrix()=default;
+    ~Matrix()=default;
+    Matrix(const Matrix&)=default;
+    Matrix(Matrix&&) =default;
+
+    size_t size() const{
+        return matrix_.size();
+    }
+
+    template <typename... Args>
+    T operator()(Args&&... val) const
+    {
+        nsp_indx t_indx = indx_creat(std::forward<Args>(val)...);
+        auto it_elem = matrix_.find(t_indx);
+        if(it_elem ==  matrix_.end()){
+            return (T)defaultParam;
+        }
+        return matrix_.at(t_indx);
+    }
+
+    template <typename... Args>
+    IndexProxy operator() (Args&&... val){
+        return{*this, indx_creat(std::forward<Args>(val)...)};
+    }
+
+    T operator() (const nsp_indx& indx)const {
+        auto it_elem = matrix_.find(indx);
+        if(it_elem ==  matrix_.end()){
+            return (T)defaultParam;
+        }
+        return matrix_.at(indx);
+    }
+
+    IndexProxy operator() (const nsp_indx& indx){
+        return{*this,indx};
+    }
+
+    int operator[](int i){
+        return *this[i];
+    }
+
+    size_t getDimention()const noexcept{
+        return dimentions;
+    }
+
+    int getDefaultNum()const noexcept {
+        return defaultParam;
+    }
+
+    auto begin(){
+        return Matrix_iterator<decltype(std::begin(matrix_))>(std::begin(matrix_));
+    }
+
+    auto end(){
+        return Matrix_iterator<decltype(std::end(matrix_))>(std::end(matrix_));    
+    }
+    
+    auto begin()const{
+        return Matrix_iterator<decltype(std::cbegin(matrix_))>(std::begin(matrix_));
+    }
+
+    auto end()const{
+        return Matrix_iterator<decltype(std::cend(matrix_))>(std::end(matrix_));    
+    }
+
+    template<class U, int defaultParamRhs>
+    auto operator+ (const Matrix<U,defaultParamRhs,dimentions>& rhs)const{
+        Matrix<U,defaultParamRhs+defaultParam,dimentions> result;
+
+        for(const auto& elem:matrix_)
+            result(elem.first) = elem.second + rhs(elem.first);
+
+        for(const auto& r_elem:rhs)
+            result(r_elem.first) = (*this)(r_elem.first) + r_elem.second;
+
+        return result;
+    }
+
+    template<class U, int defaultParamRhs>
+    auto operator- (const Matrix<U,defaultParamRhs,dimentions>& rhs)const{
+        Matrix<U,defaultParamRhs+defaultParam,dimentions> result;
+
+        for(const auto& elem:matrix_)
+            result(elem.first) = elem.second -  rhs(elem.first);
+
+        for(const auto& r_elem:rhs)
+            result(r_elem.first) = (*this)(r_elem.first) - r_elem.second;
+
+        return result;
+    }
+
+    // not done yet
+    // auto operator+ (const int num) const {
+    //     Matrix<T,num+defaultParam,dimentions> result;
+    //     for(const auto& elem:matrix_)
+    //         result(elem.first) += num;
+    //     return result;
+    // }
+
+    // auto operator- (int num){
+    //     Matrix<T,defaultParam-num,dimentions> result;
+    //     for(const auto& elem:matrix_)
+    //         result(elem.first) -= num;
+    //     return result;
+    // }
+
+    // auto operator* (int num){
+    //     Matrix<T,defaultParam*num,dimentions> result;
+    //     for(const auto& elem:matrix_)
+    //         result(elem.first) *= num;
+    //     return result;
+    // }
 
 private:
     template <typename Iter>
@@ -28,10 +142,6 @@ private:
             return *this;
         }
 
-        // T& operator* (){
-        //     return itr_matrix_->second;
-        // }
-
         auto& operator* (){
             return *itr_matrix_;
         }
@@ -44,88 +154,47 @@ private:
     class IndexProxy
 	{
 	public:
-		IndexProxy(Matrix& matrix, const elem_pos& pos):proxy_matrix_(matrix), pos_(pos){}
+        IndexProxy(Matrix& matrix, const nsp_indx& indx):proxy_matrix_(matrix), indx_(indx){}
 		IndexProxy(const IndexProxy&) = default;
 		IndexProxy(IndexProxy&&) = default;
 		~IndexProxy() = default;
 
         IndexProxy &operator=(T elem)
         {
-            auto it_elem = proxy_matrix_.matrix_.find(pos_);
+            auto it_elem = proxy_matrix_.matrix_.find(indx_);
 
             if (it_elem == proxy_matrix_.matrix_.end() 
                 && elem != (T)defaultParam)
             {
-                proxy_matrix_.matrix_[pos_] = elem;
+                proxy_matrix_.matrix_[indx_] = elem;
             }
             else if(elem == (T)defaultParam){
-                proxy_matrix_.matrix_.erase(pos_);
+                proxy_matrix_.matrix_.erase(indx_);
                 return *this;
             }
             else
-                proxy_matrix_.matrix_[pos_] = elem;
+                proxy_matrix_.matrix_[indx_] = elem;
             return *this;
         }
 
         operator T()const {
-			return std::as_const(proxy_matrix_)(pos_.first,pos_.second);
+			return std::as_const(proxy_matrix_)(indx_);
 		}
 
 	private:
 		Matrix& proxy_matrix_;
-		elem_pos pos_;
+		nsp_indx indx_;
 	};
 
-public:
-    Matrix()=default;
-    ~Matrix()=default;
-    Matrix(const Matrix&)=default;
-    Matrix(Matrix&&) =default;
-
-    size_t size(){
-        return matrix_.size();
-    }
-
-/*
-
-template<typename... Args>
-    Node (Args&&... val):value(std::forward<Args>(val)...)
-*/
-
-    T operator() (size_t n, size_t m)const {
-        auto it_elem = matrix_.find(std::make_pair(n,m));
-        if(it_elem ==  matrix_.end()){
-            return (T)defaultParam;
-        }
-        return matrix_.at(std::make_pair(n,m));
-    }
-    IndexProxy operator() (size_t n, size_t m){
-        return{*this,std::make_pair(n,m)};
-    }
-
-    // T operator() (size_t n, size_t m)const {
-    //     auto it_elem = matrix_.find(std::make_pair(n,m));
-    //     if(it_elem ==  matrix_.end()){
-    //         return (T)defaultParam;
-    //     }
-    //     return matrix_.at(std::make_pair(n,m));
-    // }
-    // IndexProxy operator() (size_t n, size_t m){
-    //     return{*this,std::make_pair(n,m)};
-    // }
-
-    auto begin(){
-        return Matrix_iterator<decltype(std::begin(matrix_))>(std::begin(matrix_));
-    }
-    auto end(){
-        return Matrix_iterator<decltype(std::end(matrix_))>(std::end(matrix_));    
-    }
-    
-    auto begin()const{
-        return Matrix_iterator<decltype(std::cbegin(matrix_))>(std::begin(matrix_));
-    }
-    auto end()const{
-        return Matrix_iterator<decltype(std::cend(matrix_))>(std::end(matrix_));    
+private:
+    template <typename... Args>
+    nsp_indx indx_creat(Args&&... val) const{
+        if(sizeof...(val)>dimentions)
+            throw std::out_of_range("out of matrix dimention");
+        size_t i =0;
+        nsp_indx indx;
+        ((indx[i++]=val),...);
+        return indx;
     }
 private:
     matrix_core_ matrix_;
