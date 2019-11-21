@@ -180,10 +180,27 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         assert(matrix_3.getDefaultNum() == 3);
         assert(matrix_3.size() == 3);
 
-        std::cout<<matrix_3.getDefaultNum()<<std::endl;
-        std::cout<<matrix_3(1,1)<<std::endl;
-        std::cout<<matrix_3(1,2)<<std::endl;
-        std::cout<<matrix_3(2,1)<<std::endl;
+        std::cout << "matrix_1 defNum= " << matrix_1.getDefaultNum()<<std::endl;
+        std::cout << "matrix_2 defNum= " << matrix_2.getDefaultNum()<<std::endl;
+        std::cout << "New matrix (matrix_1 + matrix_2) defNum= " << matrix_3.getDefaultNum()<<std::endl;
+        std::cout<<
+            "matrix_1(1,1): "<< matrix_1(1,1) 
+            <<" + "<< 
+            "matrix_2(1,1): "<<matrix_2(1,1) 
+            << " = " << 
+            matrix_3(1,1)<<std::endl;
+        std::cout<<
+            "matrix_1(1,2): "<< matrix_1(1,2) 
+            <<" + "<< 
+            "matrix_2(1,2): "<<matrix_2(1,2) 
+            << " = " << 
+            matrix_3(1,2)<<std::endl;
+        std::cout<<
+            "matrix_1(2,1): "<< matrix_1(2,1) 
+            <<" + "<< 
+            "matrix_2(2,1): "<<matrix_2(2,1) 
+            << " = " << 
+            matrix_3(2,1)<<std::endl;
     }
 
     {
@@ -202,10 +219,27 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         assert(matrix_3.getDefaultNum() == -1);
         assert(matrix_3.size() == 3);
 
-        std::cout<<matrix_3.getDefaultNum()<<std::endl;
-        std::cout<<matrix_3(1,1)<<std::endl;
-        std::cout<<matrix_3(1,2)<<std::endl;
-        std::cout<<matrix_3(2,1)<<std::endl;
+        std::cout << "matrix_1 defNum= " << matrix_1.getDefaultNum()<<std::endl;
+        std::cout << "matrix_2 defNum= " << matrix_2.getDefaultNum()<<std::endl;
+        std::cout << "New matrix (matrix_1 - matrix_2) defNum= " << matrix_3.getDefaultNum()<<std::endl;
+        std::cout<<
+            "matrix_1(1,1): "<< matrix_1(1,1) 
+            <<" - "<< 
+            "matrix_2(1,1): "<<matrix_2(1,1) 
+            << " = " << 
+            matrix_3(1,1)<<std::endl;
+        std::cout<<
+            "matrix_1(1,2): "<< matrix_1(1,2) 
+            <<" - "<< 
+            "matrix_2(1,2): "<<matrix_2(1,2) 
+            << " = " << 
+            matrix_3(1,2)<<std::endl;
+        std::cout<<
+            "matrix_1(2,1): "<< matrix_1(2,1) 
+            <<" - "<< 
+            "matrix_2(2,1): "<<matrix_2(2,1) 
+            << " = " << 
+            matrix_3(2,1)<<std::endl;
     }
 
     {
@@ -217,7 +251,19 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         assert(matrix_1.size() == 0);
     }
 
-
+    {
+        std::cout<<"multiple []"<<std::endl;
+        Matrix<int,0,3> matrix;
+        assert(matrix[0][1][0] == 0) ;
+        matrix[0][1][0] = 10;
+        assert(matrix[0][1][0] == 10);
+        assert(matrix.size() == 1);
+        matrix[0][1][1] = 10;
+        matrix[0][1][2] = 10;
+        assert(matrix.size() == 3);
+        matrix[0][1][2] = 0;
+        assert(matrix.size() == 2);
+    }
     return 0;
 }
 

@@ -57,8 +57,8 @@ public:
         return{*this,indx};
     }
 
-    int operator[](int i){
-        return *this[i];
+    IndexProxy operator[](size_t i){
+        return {*this,i};
     }
 
     size_t getDimention()const noexcept{
@@ -116,28 +116,6 @@ public:
         return result;
     }
 
-    // not done yet
-    // auto operator+ (const int num) const {
-    //     Matrix<T,num+defaultParam,dimentions> result;
-    //     for(const auto& elem:matrix_)
-    //         result(elem.first) += num;
-    //     return result;
-    // }
-
-    // auto operator- (int num){
-    //     Matrix<T,defaultParam-num,dimentions> result;
-    //     for(const auto& elem:matrix_)
-    //         result(elem.first) -= num;
-    //     return result;
-    // }
-
-    // auto operator* (int num){
-    //     Matrix<T,defaultParam*num,dimentions> result;
-    //     for(const auto& elem:matrix_)
-    //         result(elem.first) *= num;
-    //     return result;
-    // }
-
 private:
     /* class IterProxy to handle something like 
 	for(auto& elem:matrix)
@@ -169,13 +147,32 @@ private:
     class IndexProxy
 	{
 	public:
-        IndexProxy(Matrix& matrix, const nsp_indx& indx):proxy_matrix_(matrix), indx_(indx){}
+        IndexProxy(Matrix& matrix, const nsp_indx& indx):
+            proxy_matrix_(matrix), indx_(indx),pos_in_indx{dimentions} {}
+
+        IndexProxy(Matrix& matrix, size_t first_):
+            proxy_matrix_(matrix), pos_in_indx{0} {indx_.at(pos_in_indx++) = first_;}
+
 		IndexProxy(const IndexProxy&) = default;
 		IndexProxy(IndexProxy&&) = default;
 		~IndexProxy() = default;
 
+        IndexProxy& operator[] (size_t n) {
+            if(pos_in_indx >= dimentions)
+                throw std::out_of_range("Out of range");
+
+            while(pos_in_indx != dimentions){
+                indx_.at(pos_in_indx++) = n;
+                return *this;
+            }
+            return *this;
+        }
+
         IndexProxy &operator=(T elem)
         {
+            if(pos_in_indx < dimentions)
+                throw std::range_error("Partial index was given");
+
             auto it_elem = proxy_matrix_.matrix_.find(indx_);
 
             if (it_elem == proxy_matrix_.matrix_.end() 
@@ -193,12 +190,16 @@ private:
         }
 
         operator T()const {
+            if(pos_in_indx < dimentions)
+                throw std::range_error("Partial index was given");
+
 			return as_const(proxy_matrix_)(indx_);
 		}
 
 	private:
 		Matrix& proxy_matrix_;
 		nsp_indx indx_;
+        size_t pos_in_indx;
 	};
 
 private:
