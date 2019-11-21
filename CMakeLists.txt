@@ -24,7 +24,7 @@ set_target_properties(matrix test_access test_loop test_op PROPERTIES
 )
 
 
-set_target_properties(test_access  test_loop test_op PROPERTIES
+set_target_properties(matrix test_access test_loop test_op PROPERTIES
     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
