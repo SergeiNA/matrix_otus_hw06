@@ -6,6 +6,8 @@ endif()
 
 project(matrix VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
+#set(Boost_USE_STATIC_LIBS   ON)
+
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
@@ -23,8 +25,17 @@ set_target_properties(matrix test_access test_loop test_op PROPERTIES
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 
+set_target_properties(matrix PROPERTIES
+Boost_USE_STATIC_LIBS   ON
 
-set_target_properties(matrix test_access test_loop test_op PROPERTIES
+)
+
+# set_target_properties(matrix PROPERTIES
+#     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+#     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+# )
+
+set_target_properties(test_access test_loop test_op PROPERTIES
     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
