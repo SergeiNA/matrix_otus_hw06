@@ -30,6 +30,12 @@ set_target_properties(matrix test_access test_access_sq test_loop test_op PROPER
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
+set_target_properties(matrix test_access test_access_sq test_loop test_op PROPERTIES
+    COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+    INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+)
+
+# 
 
 target_link_libraries(matrix
     ${Boost_LIBRARIES}
@@ -72,8 +78,8 @@ include(CPack)
 
 enable_testing()
 
-add_test(test_access_t test_access)
-add_test(test_access_t test_access_sq)
+add_test(test_access test_access)
+add_test(test_access_sq test_access_sq)
 add_test(test_loop test_loop)
 add_test(test_op test_op)
 
