@@ -142,13 +142,54 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         size_t n_counter = 0;
         for (size_t i = 0; i < N/2; ++i)
         {
+            size_t k = (N/2)%2;
             for (size_t j = 0 + i % 2; j < N; j += 2)
             {
                 matrix(i, j) = 0;
-                matrix(N-1-i, j+1) = 0;
+                matrix(i + N/2,k*(N-j-1)+(1-k)*j) = 0;
                 ++n_counter;
             }
         }
+        {
+            // ADDED
+            size_t N=10;
+            Matrix<int, 0> matrix_ts;
+            size_t k = (N/2)%2;
+            for (size_t i = 0; i < N / 2; ++i)
+            {
+                for (size_t j = 0 + i % 2; j < N; j += 2)
+                {
+                    matrix_ts(i, j) = 1;
+                    matrix_ts(i + N/2,k*(N-j-1)+(1-k)*j) = 2;
+                }
+            }
+            std::cout<<"Fill matrix chess-like test\n";
+            pretty_print_rect_2D(matrix_ts, N, N);
+        }
+        {
+            // ADDED
+            size_t N = 8;
+            Matrix<int, 0> matrix_ts;
+            for (size_t i = 0; i < N; i++){
+                //matrix_ts[i][i] = matrix_ts[N - 1 - i][i] = i;
+                matrix_ts(i,i) = matrix_ts(N - 1 - i, i) = i;
+            }
+            std::cout << "Fill matrix diag assign test, use (n,n,...,n)\n";
+            pretty_print_rect_2D(matrix_ts, N, N);
+            std::cout<<std::endl;
+        }
+        {
+            // ADDED
+            size_t N = 8;
+            Matrix<int, 0> matrix_ts;
+            for (size_t i = 0; i < N; i++){
+                matrix_ts[i][i] = matrix_ts[N - 1 - i][i] = i;
+            }
+            std::cout << "Fill matrix diag assign test, use [][],...,[]\n";
+            pretty_print_rect_2D(matrix_ts, N, N);
+            std::cout<<std::endl;
+        }
+
         std::cout<<"Fill matrix chess-like\n";
         std::cout<<"Counter: "<<n_counter<<std::endl;
         pretty_print_rect_2D(matrix, N, N);
@@ -156,6 +197,7 @@ int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
         // [1,1] [8,8]
         std::cout<<"Fill matrix chess-like [1,1] [8,8]\n";
         pretty_print_rect_2D(matrix, 9, 9,1,1);
+        return 0;
         std::cout<<"Unique elements:\n";
         for (const auto &i : matrix)
         {

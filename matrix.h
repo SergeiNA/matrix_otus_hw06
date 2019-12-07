@@ -61,6 +61,10 @@ public:
         return {*this,i};
     }
 
+    // IndexProxy(const Matrix<T,defaultParamRhs,dimentions>::IndexProxy& rhs) {
+    //         return *this;
+    // };
+
     size_t getDimention()const noexcept{
         return dimentions;
     }
@@ -157,6 +161,8 @@ private:
 		IndexProxy(IndexProxy&&) = default;
 		~IndexProxy() = default;
 
+
+
         IndexProxy& operator[] (size_t n) {
             if(pos_in_indx >= dimentions)
                 throw std::out_of_range("Out of range");
@@ -168,7 +174,7 @@ private:
             return *this;
         }
 
-        IndexProxy &operator=(T elem)
+        T operator=(T elem)
         {
             if(pos_in_indx < dimentions)
                 throw std::range_error("Partial index was given");
@@ -182,14 +188,13 @@ private:
             }
             else if(elem == (T)defaultParam){
                 proxy_matrix_.matrix_.erase(indx_);
-                return *this;
             }
             else
                 proxy_matrix_.matrix_[indx_] = elem;
-            return *this;
+            return elem;
         }
 
-        operator T()const {
+        operator T() const {
             if(pos_in_indx < dimentions)
                 throw std::range_error("Partial index was given");
 
